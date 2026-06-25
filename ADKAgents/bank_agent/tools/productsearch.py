@@ -45,7 +45,7 @@ def vertex_vector_search(query: str) -> str:
             content_search_spec=content_search_spec
         )
 
-        # Step 2: Execute the search and extract text segments from each result
+        # Step 2: Execute the search and extract text segments from each result.
         response = client.search(request)
 
         context_blocks = []
