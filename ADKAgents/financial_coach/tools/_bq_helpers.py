@@ -14,8 +14,8 @@ from google.cloud import bigquery
 # Config — loaded at import time (after load_dotenv() in agent.py)
 # ─────────────────────────────────────────────────────────────────
 
-BQ_PROJECT  = "ltc-ipnihack-prj-11"
-BQ_DATASET  = "BANK_DATA"
+BQ_PROJECT  = "lbg-pec-hack"
+BQ_DATASET  = "lbg_pec_hack"
 BQ_LOCATION = "US"
 
 if not BQ_PROJECT:

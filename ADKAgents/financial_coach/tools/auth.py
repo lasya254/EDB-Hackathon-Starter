@@ -12,8 +12,8 @@ from google.cloud import bigquery
 
 bq = bigquery.Client()
 
-PROJECT        = "ltc-ipnihack-prj-11"
-DS             = "BANK_DATA"
+PROJECT        = "lbg-pec-hack"
+DS             = "lbg_pec_hack"
 AUTH_TABLE     = f"`{PROJECT}.{DS}.auth_sessions`"
 ACCOUNTS_TABLE = f"`{PROJECT}.{DS}.accounts`"
 

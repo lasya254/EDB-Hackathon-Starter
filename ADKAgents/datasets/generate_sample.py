@@ -9,8 +9,8 @@ import uuid
 fake = Faker('en_IN')
 client = bigquery.Client()
 
-PROJECT = "ltc-ipnihack-prj-11"
-DATASET = "BANK_DATA"
+PROJECT = "lbg-pec-hack"
+DATASET = "lbg_pec_hack"
 
 def generate_customers(num_customers: int = 100):
     """Generate sample customer data."""
