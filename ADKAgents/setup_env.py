@@ -118,6 +118,7 @@ def main():
         padding=(0, 2),
     ))
     console.print()
+    
 
 
 if __name__ == "__main__":
