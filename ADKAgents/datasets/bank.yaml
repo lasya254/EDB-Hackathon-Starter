@@ -1,17 +1,6 @@
 dataset: ${BQ_DATASET}
 
 tables:
-  - name: customers
-    schema:
-      - {name: customer_id, type: STRING}
-      - {name: name,        type: STRING}
-      - {name: dob,         type: STRING}
-      - {name: postcode,    type: STRING}
-      - {name: address,     type: STRING}
-      - {name: age,         type: INTEGER}
-      - {name: gender,      type: STRING}
-      - {name: phone,       type: STRING}
-    seed_file: bq_seed/customers.json
 
   - name: accounts
     schema:

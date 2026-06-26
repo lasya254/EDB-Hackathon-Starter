@@ -11,17 +11,22 @@ from .observability import (
     before_model_callback,
     setup_observability,
 )
-from .prompt import AGENT_INSTRUCTION
-from .tools.bigquery_tool import run_bigquery_query
-from .tools.customersearch import customer_database_search, customer_id_search
-from .tools.productsearch import vertex_vector_search
-from .tools.ecommerce_tools import lookup_user_orders, check_product_stock, sales_reporting_query
+from .prompt import ROOT_AGENT_PROMPT
+from .sub_agents import (
+    customer_context_agent,
+    spending_agent,
+    investment_agent,
+    debt_agent,
+    fd_agent,
+    insurance_agent,
+    financial_score_agent,
+)
 
 load_dotenv()
 
 
 class VertexGemini(Gemini):
-    """Gemini model that unconditionally uses Vertex AI (ADC) instead of an API key."""
+    """Gemini on Vertex AI using Application Default Credentials."""
 
     @cached_property
     def api_client(self) -> Client:
@@ -32,15 +37,27 @@ class VertexGemini(Gemini):
         )
 
 
-# Initialise OpenTelemetry exporters and the metrics store.
 setup_observability()
 
 root_agent = Agent(
-    name="bank_agent",
+    name="financial_coach",
     model=VertexGemini(model="gemini-2.5-flash"),
-    description="A helpful banking assistant.",
-    instruction=AGENT_INSTRUCTION,
-    tools=[customer_id_search, customer_database_search, vertex_vector_search, run_bigquery_query, lookup_user_orders, check_product_stock, sales_reporting_query],
+    description=(
+        "Master financial coach that delegates to specialist agents for "
+        "customer context, spending, investments, debt, fixed deposits, "
+        "insurance, and financial score."
+    ),
+    instruction=ROOT_AGENT_PROMPT,
+    tools=[],
+    sub_agents=[
+        customer_context_agent,
+        spending_agent,
+        investment_agent,
+        debt_agent,
+        fd_agent,
+        insurance_agent,
+        financial_score_agent,
+    ],
     before_model_callback=before_model_callback,
     after_model_callback=after_model_callback,
 )

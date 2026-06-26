@@ -1,0 +1,218 @@
+[
+  {
+    "account_id": "ACC0001",
+    "customer_id": "C1001",
+    "product_type": "salary",
+    "balance": 137531.73
+  },
+  {
+    "account_id": "ACC0002",
+    "customer_id": "C1001",
+    "product_type": "savings",
+    "balance": 457002.38
+  },
+  {
+    "account_id": "ACC0003",
+    "customer_id": "C1002",
+    "product_type": "salary",
+    "balance": 438801.98
+  },
+  {
+    "account_id": "ACC0004",
+    "customer_id": "C1002",
+    "product_type": "current",
+    "balance": 110250.14
+  },
+  {
+    "account_id": "ACC0005",
+    "customer_id": "C1002",
+    "product_type": "current",
+    "balance": 200837.79
+  },
+  {
+    "account_id": "ACC0006",
+    "customer_id": "C1003",
+    "product_type": "salary",
+    "balance": 232131.67
+  },
+  {
+    "account_id": "ACC0007",
+    "customer_id": "C1003",
+    "product_type": "current",
+    "balance": 74117.01
+  },
+  {
+    "account_id": "ACC0008",
+    "customer_id": "C1003",
+    "product_type": "salary",
+    "balance": 282877.23
+  },
+  {
+    "account_id": "ACC0009",
+    "customer_id": "C1004",
+    "product_type": "salary",
+    "balance": 374771.84
+  },
+  {
+    "account_id": "ACC0010",
+    "customer_id": "C1004",
+    "product_type": "current",
+    "balance": 449422.33
+  },
+  {
+    "account_id": "ACC0011",
+    "customer_id": "C1005",
+    "product_type": "salary",
+    "balance": 184188.24
+  },
+  {
+    "account_id": "ACC0012",
+    "customer_id": "C1005",
+    "product_type": "savings",
+    "balance": 257215.52
+  },
+  {
+    "account_id": "ACC0013",
+    "customer_id": "C1006",
+    "product_type": "salary",
+    "balance": 379112.17
+  },
+  {
+    "account_id": "ACC0014",
+    "customer_id": "C1007",
+    "product_type": "salary",
+    "balance": 80656.45
+  },
+  {
+    "account_id": "ACC0015",
+    "customer_id": "C1008",
+    "product_type": "salary",
+    "balance": 397079.29
+  },
+  {
+    "account_id": "ACC0016",
+    "customer_id": "C1009",
+    "product_type": "salary",
+    "balance": 300222.47
+  },
+  {
+    "account_id": "ACC0017",
+    "customer_id": "C1009",
+    "product_type": "current",
+    "balance": 193901.55
+  },
+  {
+    "account_id": "ACC0018",
+    "customer_id": "C1010",
+    "product_type": "salary",
+    "balance": 266911.6
+  },
+  {
+    "account_id": "ACC0019",
+    "customer_id": "C1010",
+    "product_type": "salary",
+    "balance": 431085.95
+  },
+  {
+    "account_id": "ACC0020",
+    "customer_id": "C1011",
+    "product_type": "salary",
+    "balance": 341740.29
+  },
+  {
+    "account_id": "ACC0021",
+    "customer_id": "C1012",
+    "product_type": "salary",
+    "balance": 342446.63
+  },
+  {
+    "account_id": "ACC0022",
+    "customer_id": "C1013",
+    "product_type": "salary",
+    "balance": 376684.51
+  },
+  {
+    "account_id": "ACC0023",
+    "customer_id": "C1013",
+    "product_type": "salary",
+    "balance": 173386.86
+  },
+  {
+    "account_id": "ACC0024",
+    "customer_id": "C1013",
+    "product_type": "current",
+    "balance": 220208.8
+  },
+  {
+    "account_id": "ACC0025",
+    "customer_id": "C1014",
+    "product_type": "salary",
+    "balance": 6606.43
+  },
+  {
+    "account_id": "ACC0026",
+    "customer_id": "C1014",
+    "product_type": "salary",
+    "balance": 438547.21
+  },
+  {
+    "account_id": "ACC0027",
+    "customer_id": "C1015",
+    "product_type": "salary",
+    "balance": 486084.61
+  },
+  {
+    "account_id": "ACC0028",
+    "customer_id": "C1015",
+    "product_type": "savings",
+    "balance": 256302.43
+  },
+  {
+    "account_id": "ACC0029",
+    "customer_id": "C1016",
+    "product_type": "salary",
+    "balance": 435906.69
+  },
+  {
+    "account_id": "ACC0030",
+    "customer_id": "C1017",
+    "product_type": "salary",
+    "balance": 421626.33
+  },
+  {
+    "account_id": "ACC0031",
+    "customer_id": "C1017",
+    "product_type": "salary",
+    "balance": 306440.25
+  },
+  {
+    "account_id": "ACC0032",
+    "customer_id": "C1018",
+    "product_type": "salary",
+    "balance": 190087.36
+  },
+  {
+    "account_id": "ACC0033",
+    "customer_id": "C1019",
+    "product_type": "salary",
+    "balance": 271992.62
+  },
+  {
+    "account_id": "ACC0034",
+    "customer_id": "C1020",
+    "product_type": "salary",
+    "balance": 459654.28
+  },
+  {
+    "account_id": "ACC0035",
+    "customer_id": "C1020",
+    "product_type": "salary",
+    "balance": 165457.25
+  },
+  {
+    "account_id": "ACC0036",
+    "customer_id": "C1020",
+    "product_type": "savings",
+    "balance": 60374.52
+  }
+]

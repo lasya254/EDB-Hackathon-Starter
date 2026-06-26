@@ -20,13 +20,13 @@ app = get_fast_api_app(
 
 
 from fastapi.responses import HTMLResponse
-from bank_agent.observability import store, CostGranularity
+from financial_coach.observability import store, CostGranularity
 
 
 @app.get("/obs", response_class=HTMLResponse)
 async def obs_dashboard():
     """Serves the frontend dashboard for agent observability."""
-    html_path = os.path.join(AGENT_DIR, "bank_agent", "observability", "dashboard.html")
+    html_path = os.path.join(AGENT_DIR, "financial_coach", "observability", "dashboard.html")
     if os.path.exists(html_path):
         with open(html_path, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
