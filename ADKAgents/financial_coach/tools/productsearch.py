@@ -4,7 +4,6 @@ import vertexai
 from google.cloud import discoveryengine_v1beta as discoveryengine
 from vertexai.generative_models import GenerativeModel
 from dotenv import load_dotenv
-
 from ..observability.tool_tracer import traced_tool
 
 load_dotenv()
