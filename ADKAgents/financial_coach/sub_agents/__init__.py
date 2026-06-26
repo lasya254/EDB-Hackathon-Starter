@@ -5,6 +5,7 @@ from .fd_agent import fd_agent
 from .insurance_agent import insurance_agent
 from .spending_agent import spending_agent
 from .financial_score_agent import financial_score_agent
+from .auth_agent import auth_agent
 
 __all__ = [
     "customer_context_agent",
@@ -14,4 +15,5 @@ __all__ = [
     "insurance_agent",
     "spending_agent",
     "financial_score_agent",
+    "auth_agent",
 ]

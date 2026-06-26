@@ -1,18 +1,15 @@
-"""ADK model callbacks for observability.
+"""ADK model callbacks for observability + auth gating.
 
 Implements ``before_model_callback`` and ``after_model_callback`` to capture
-LLM inputs/outputs, token usage, latency, and cost.  Records are pushed to
-the in-memory :pymod:`metrics` store and, when OpenTelemetry is configured,
-emitted as span attributes.
+LLM inputs/outputs, token usage, latency, and cost.
 
-.. important::
-   ADK resolves callback parameters **by name** — do **not** rename
-   ``callback_context`` or ``llm_response`` / ``llm_request``.
+Also enforces authentication before customer-specific sensitive financial queries.
 """
 
 from __future__ import annotations
 
 import logging
+import re
 import time
 from typing import Optional
 
@@ -21,7 +18,7 @@ from google.adk.models import LlmRequest, LlmResponse
 
 from .config import LOG_LLM_CONTENT, get_pricing
 from .metrics import LlmCallRecord, store
-
+from ..tools.auth import check_session
 try:
     from opentelemetry import trace as otel_trace
     _tracer = otel_trace.get_tracer("bank_agent.observability")
@@ -30,13 +27,78 @@ except ImportError:
 
 logger = logging.getLogger("bank_agent.observability")
 
-# We stash the start timestamp on callback_context.state under this key so
-# we can compute wall-clock latency in the after-callback.
 _START_KEY = "_obs_llm_start_ns"
+
+# ---------------------------------------------------------------------------
+# Auth helpers
+# ---------------------------------------------------------------------------
+
+SENSITIVE_KEYWORDS = [
+    "financial",
+    "report",
+    "score",
+    "summary",
+    "account",
+    "balance",
+    "transaction",
+    "transactions",
+    "spending",
+    "spend",
+    "spent",
+    "expense",
+    "expenses",
+    "expenditure",
+    "budget",
+    "cashflow",
+    "income",
+    "savings",
+    "investment",
+    "investments",
+    "portfolio",
+    "loan",
+    "loans",
+    "emi",
+    "credit card",
+    "credit cards",
+    "debt",
+    "fd",
+    "fixed deposit",
+    "insurance",
+    "premium",
+    "net worth",
+]
+
+
+def _extract_customer_id(text: str) -> str | None:
+    """Extract customer ID like C1001 from user text."""
+    if not text:
+        return None
+    match = re.search(r"\bC\d{4,}\b", text, re.IGNORECASE)
+    return match.group(0).upper() if match else None
+
+def _requires_auth(text: str, customer_id: str | None) -> bool:
+    """Customer-specific financial queries must always authenticate."""
+    if not text or not customer_id:
+        return False
+
+    lower = text.lower()
+    return any(keyword in lower for keyword in SENSITIVE_KEYWORDS)
+
+def _force_auth_response(message: str) -> LlmResponse:
+    """
+    Return an immediate model response to stop routing and force auth flow.
+    This avoids letting the root agent continue to another sub-agent.
+    """
+    return LlmResponse(
+        content={
+            "role": "model",
+            "parts": [{"text": message}],
+        }
+    )
 
 
 # ---------------------------------------------------------------------------
-# Helpers
+# Observability helpers
 # ---------------------------------------------------------------------------
 
 def _extract_last_user_text(llm_request: LlmRequest) -> str:
@@ -46,7 +108,7 @@ def _extract_last_user_text(llm_request: LlmRequest) -> str:
             last = llm_request.contents[-1]
             if hasattr(last, "parts") and last.parts:
                 texts = [p.text for p in last.parts if hasattr(p, "text") and p.text]
-                return " ".join(texts)[:500]  # cap preview length
+                return " ".join(texts)[:500]
     except Exception:
         pass
     return ""
@@ -70,7 +132,6 @@ def _extract_response_text(llm_response: LlmResponse) -> str:
 def _session_id_from_ctx(callback_context: CallbackContext) -> str:
     """Extract a session identifier from the callback context."""
     try:
-        # CallbackContext exposes a .session property that returns the Session object
         session = callback_context.session
         if session is not None:
             return str(session.id or "unknown")
@@ -87,14 +148,62 @@ def before_model_callback(
     callback_context: CallbackContext,
     llm_request: LlmRequest,
 ) -> Optional[LlmResponse]:
-    """Stamp the start time and snapshot the prompt for the after-callback."""
+    """Stamp start time, snapshot prompt, and enforce auth for sensitive requests."""
     callback_context.state[_START_KEY] = time.perf_counter_ns()
 
-    # Snapshot the latest user text so the after-callback can log it.
-    if LOG_LLM_CONTENT:
-        callback_context.state["_obs_last_prompt"] = _extract_last_user_text(llm_request)
+    user_text = _extract_last_user_text(llm_request)
 
-    return None  # let the request proceed unmodified
+    if LOG_LLM_CONTENT:
+        callback_context.state["_obs_last_prompt"] = user_text
+
+    # -------------------------------------------------------------------
+    # AUTH GATE
+    # -------------------------------------------------------------------
+    customer_id = _extract_customer_id(user_text)
+    is_sensitive = _requires_auth(user_text, customer_id)
+
+    # Persist customer_id if found
+    if customer_id:
+        callback_context.state["customer_id"] = customer_id
+
+    # Read session info from state
+    session_id = callback_context.state.get("auth_session_id")
+    state_customer_id = callback_context.state.get("customer_id")
+
+    if customer_id and is_sensitive:
+        # No auth session yet -> stop and ask user to authenticate
+        if not session_id:
+            callback_context.state["pending_customer_id"] = customer_id
+            callback_context.state["auth_required"] = True
+            callback_context.state["original_request"] = user_text
+
+            return _force_auth_response(
+                f"Before I can share any financial details for {customer_id}, I need to verify your identity. "
+                f"Please continue with authentication first."
+            )
+
+        # Validate existing session
+        try:
+            auth_result = check_session(session_id=session_id, customer_id=state_customer_id or customer_id)
+        except Exception as e:
+            logger.exception("Auth session check failed: %s", e)
+            callback_context.state["auth_required"] = True
+            return _force_auth_response(
+                "I could not validate your session right now. Please authenticate again."
+            )
+
+        if not auth_result.get("authenticated"):
+            callback_context.state["auth_required"] = True
+            callback_context.state["pending_customer_id"] = customer_id
+            callback_context.state["original_request"] = user_text
+
+            return _force_auth_response(
+                f"Your session is not verified for {customer_id}. Please authenticate first."
+            )
+
+        callback_context.state["auth_required"] = False
+
+    return None
 
 
 def after_model_callback(
@@ -131,7 +240,6 @@ def after_model_callback(
     prompt_preview: str | None = None
     response_preview: str | None = None
     if LOG_LLM_CONTENT:
-        # We don't have llm_request in the after callback — reconstruct from context
         prompt_preview = callback_context.state.get("_obs_last_prompt", None)
         response_preview = _extract_response_text(llm_response)
 
@@ -160,7 +268,7 @@ def after_model_callback(
         agent_name, model_name, input_tokens, output_tokens, total_tokens, cost_usd, latency_ms, session_id,
     )
 
-    # 8. OTEL span attributes (if tracer is available) ---------------------
+    # 8. OTEL span attributes ----------------------------------------------
     if _tracer is not None:
         span = otel_trace.get_current_span()
         if span and span.is_recording():
@@ -173,4 +281,4 @@ def after_model_callback(
             span.set_attribute("llm.cost_usd", cost_usd)
             span.set_attribute("llm.latency_ms", latency_ms)
 
-    return None  # let the response proceed unmodified
+    return None

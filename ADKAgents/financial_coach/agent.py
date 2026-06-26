@@ -13,6 +13,7 @@ from .observability import (
 )
 from .prompt import ROOT_AGENT_PROMPT
 from .sub_agents import (
+    auth_agent,
     customer_context_agent,
     spending_agent,
     investment_agent,
@@ -44,12 +45,13 @@ root_agent = Agent(
     model=VertexGemini(model="gemini-2.5-flash"),
     description=(
         "Master financial coach that delegates to specialist agents for "
-        "customer context, spending, investments, debt, fixed deposits, "
-        "insurance, and financial score."
+        "authentication, customer context, spending, investments, debt, "
+        "fixed deposits, insurance, and financial score."
     ),
     instruction=ROOT_AGENT_PROMPT,
     tools=[],
     sub_agents=[
+        auth_agent,
         customer_context_agent,
         spending_agent,
         investment_agent,

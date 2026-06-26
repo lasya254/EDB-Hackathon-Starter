@@ -102,14 +102,7 @@ resource "google_discovery_engine_data_store" "website_datastore" {
   depends_on                  = [google_project_service.apis]
 }
 
-# 4. Crawl all pages under the domain
-resource "google_discovery_engine_target_site" "all_pages" {
-  project              = var.project_id
-  location             = google_discovery_engine_data_store.website_datastore.location
-  data_store_id        = google_discovery_engine_data_store.website_datastore.data_store_id
-  provided_uri_pattern = "${var.website_domain}/*"
-  type                 = "INCLUDE"
-}
+
 
 # 5. Create the Search AI Application
 resource "google_discovery_engine_search_engine" "website_search_app" {
